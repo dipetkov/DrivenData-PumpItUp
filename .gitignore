@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 data/*
+Figures/*
+*.html
