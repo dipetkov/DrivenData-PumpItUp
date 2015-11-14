@@ -2,9 +2,7 @@
 title: "Clean the data and engineer some new features"
 output:
   html_document:
-    toc: true
-    theme: united
-    highlight: zenburn
+    keep_md: true 
 ---
 
 ```{r global_options, include=FALSE}

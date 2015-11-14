@@ -91,4 +91,4 @@ write.csv(submission,row.names = FALSE,quote = FALSE,
           file = "submission-h2o_randomForest-ntrees1000.csv")
 ```
 
-`h2o.randomForest` is just one of the available algorithms. You can try `h2o.gbm`, `h2o.deeplearning` or `h2o.naiveBayes`.
+`h2o.randomForest` is just one of the available algorithms. Other machine learning methods to experiment with are `h2o.gbm`, `h2o.deeplearning` or `h2o.naiveBayes`.

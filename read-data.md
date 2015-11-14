@@ -1,24 +1,17 @@
----
-title: "Read the data and do some preprocessing"
-output:
-  html_document:
-    keep_md: true 
----
+# Read the data and do some preprocessing
 
-```{r global_options, include=FALSE}
-knitr::opts_chunk$set(
-        fig.width=8, fig.height=7, fig.path='Figures/',
-	echo = TRUE, warning = FALSE, message = FALSE)
-```
 
-```{r,message = FALSE}
+
+
+```r
 ## Load useful R packages and the multiplot function from "Cookbook for R"
 source("myRsession.R")
 ```
 
 I assume that an NA, the empty string and the word "unknown" indicate missing values. Most (all?) 0s seem to indicate missing values as well. There are 40 predictors; it is feasible to specify the class of each column explicitly.
 
-```{r}
+
+```r
 na.strings = c(NA,"","unknown","Unknown")
 colClasses = c("integer","numeric","Date","character","numeric","character",
                "numeric","numeric","character","integer","character","character",
@@ -41,7 +34,8 @@ test.values = tbl_dt(fread("data/Test set values.csv",
 
 For feature engineering, I transform the training and the test sets together, so I combine them into `data`. I add the column `subset`, so that I can split the data later on.
 
-```{r}
+
+```r
 train.values$subset = "train"
 test.values$subset = "test"
 train = inner_join(train.labels, train.values, by = "id")
@@ -50,7 +44,8 @@ data = tbl_df(rbind.fill(train,test.values))
 
 A value of 0 does not make sense for the following predictors: `funder`, `installer`, `gps_height`, `population`, `construction_year`, and possibly, `amount_tsh`. It is hard to decide without knowing what tsh stands for.
 
-```{r}
+
+```r
 data = data %>%
   mutate(funder = ifelse(funder == 0, NA, funder)) %>%
   mutate(installer = ifelse(installer == 0, NA, installer)) %>%
@@ -62,7 +57,8 @@ data = data %>%
 
 Latitude ranges in [-11.65,-2e-08] and longitude ranges in [0.0,40.35]. The scatter plot suggests that the zeros indicate the coordinates are missing.
 
-```{r initial_coord_map,fig.width = 10, fig.height = 4,fig.cap = "The points (0,0) look like missing values."}
+
+```r
 p1 = ggplot(data, aes(x = longitude, y = latitude)) + geom_point(shape = 1)
 data = data %>%
   mutate(latitude = ifelse(latitude > -1e-06, NA, latitude)) %>%
@@ -71,9 +67,12 @@ p2 = ggplot(data, aes(x = longitude, y = latitude)) + geom_point(shape = 1)
 multiplot(p1, p2, cols = 2)
 ```
 
+![The points (0,0) look like missing values.](Figures/initial_coord_map-1.png) 
+
 For every categorical response, convert the levels to lower case, in case there is random capitalization.
 
-```{r}
+
+```r
 chr.cols = data %>% summarise_each(funs(is.character(.))) %>%
   unlist() %>% which() %>% names()
 data = data %>% mutate_each( funs(tolower), one_of(chr.cols))
@@ -81,7 +80,15 @@ data = data %>% mutate_each( funs(tolower), one_of(chr.cols))
 
 Finally, `recorded_by` takes a single value and so it cannot help differentiate between the three status groups.
 
-```{r}
+
+```r
 n_distinct(data$recorded_by)
+```
+
+```
+## [1] 1
+```
+
+```r
 data = data %>% select( - recorded_by )
 ```
