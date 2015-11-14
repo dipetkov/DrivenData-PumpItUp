@@ -1,11 +1,8 @@
 ---
 title: "Random forest with H2O"
 output:
-  html_document: 
+  html_document:
     keep_md: true 
-    toc: true
-    theme: united
-    highlight: zenburn
 ---
 
 ```{r global_options, include=FALSE}
