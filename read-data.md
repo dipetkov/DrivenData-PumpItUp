@@ -1,14 +1,15 @@
-# Read the data and do some preprocessing
+# Read the data and do some preprocessing.
 
 
+
+Load useful R packages and the multiplot function from "Cookbook for R".
 
 
 ```r
-## Load useful R packages and the multiplot function from "Cookbook for R"
 source("myRsession.R")
 ```
 
-I assume that an NA, the empty string and the word "unknown" indicate missing values. Most (all?) 0s seem to indicate missing values as well. There are 40 predictors; it is feasible to specify the class of each column explicitly.
+I assume that NA, the empty string and the word "unknown" indicate missing values. Most (all?) 0s seem to indicate missing values as well. There are 40 predictors; it is feasible to specify the class of each column explicitly.
 
 
 ```r
@@ -55,7 +56,7 @@ data = data %>%
   mutate(construction_year = ifelse(construction_year == 0, NA, construction_year))
 ```
 
-Latitude ranges in [-11.65,-2e-08] and longitude ranges in [0.0,40.35]. The scatter plot suggests that the zeros indicate the coordinates are missing.
+Latitude ranges in [-11.65,-2e-08] and longitude ranges in [0.0,40.35]. The scatter plot suggests that 0s indicate the coordinates are missing.
 
 
 ```r
@@ -78,17 +79,10 @@ chr.cols = data %>% summarise_each(funs(is.character(.))) %>%
 data = data %>% mutate_each( funs(tolower), one_of(chr.cols))
 ```
 
-Finally, `recorded_by` takes a single value and so it cannot help differentiate between the three status groups.
+Finally, `recorded_by` takes a single value [we can count the unique values in vector `x` with `n_distinct(x)`], and so it cannot help to differentiate between the three status groups.
 
-
-```r
-n_distinct(data$recorded_by)
-```
-
-```
-## [1] 1
-```
 
 ```r
 data = data %>% select( - recorded_by )
 ```
+

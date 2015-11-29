@@ -13,12 +13,16 @@ I use [H2O](http://h2o.ai)'s random forest to get a score 0.821. I have uploaded
 
 ## Read the data and do some preprocessing
 
-The first step is to read the data and set some values to missing (`NA` in R): `read-data`.
+The first step is to read the data and set some values to missing (`NA` in R): See `read-data.md`.
 
 ## Engineer features
 
-The next step is to clean up the features (transform some, remove others) and possibly engineer some new features: `transform-data`.
+The next step is to clean up the features (transform some, remove others) and possibly engineer some new features: See `transform-data.md`.
 
 ## Predict status with a random forest
 
-Use a random forest to predict the functionality status of pumps in the test set: `predict-data`.
+Use a random forest to predict the functionality status of pumps in the test set: See `predict-data.md`.
+
+### Update
+
+Added a Makefile, which `spin`s the `R` scripts to produces the `md` files. See how to [Build a report based on an R script](http://yihui.name/knitr/demo/stitch/).

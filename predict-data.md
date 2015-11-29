@@ -2,7 +2,6 @@
 
 
 
-
 ```r
 source("transform-data.R")
 ```
@@ -11,12 +10,14 @@ source("transform-data.R")
 
 First install the H2O package by following the instructions for R users in the [H2O documentation](http://docs.h2o.ai). Then start an H2O instance.
 
+
 ```r
 library(h2o)
 localH2O = h2o.init()
 ```
 
 Define the set of predictors (all features retained after the data cleaning/engineering phase) and the response to predict.
+
 
 ```r
 predictors = c("funder","installer","management",
@@ -42,6 +43,7 @@ testHex = as.h2o(test, destination_frame = "test.hex")
 
 Train a random forest with 1000 trees. The `mtries` parameter specifies how many variables are sampled as candidates at each split.
 
+
 ```r
 rfHex = h2o.randomForest(
   x = predictors,
@@ -52,7 +54,8 @@ rfHex = h2o.randomForest(
   seed = 123456) ## Set the seed for reproducibility of results
 ```
 
-The confusion matrix characterizes how well the fitted model predicts the training data.
+The confusion matrix characterizes how well the fitted model predicts the training data. 
+
 
 ```r
 h2o.confusionMatrix(rfHex)
@@ -61,15 +64,15 @@ h2o.confusionMatrix(rfHex)
 ```
 ## Confusion Matrix - (vertical: actual; across: predicted): vertical: actual; across: predicted
 ##                         functional functional needs repair non functional
-## functional                   29487                     571           2200
-## functional needs repair       2341                    1409            567
-## non functional                5077                     276          17471
-## Totals                       36905                    2256          20238
+## functional                   29487                     569           2202
+## functional needs repair       2345                    1402            570
+## non functional                5087                     271          17466
+## Totals                       36919                    2242          20238
 ##                          Error              Rate
 ## functional              0.0859 =  2,771 / 32,258
-## functional needs repair 0.6736 =  2,908 /  4,317
-## non functional          0.2345 =  5,353 / 22,824
-## Totals                  0.1857 = 11,032 / 59,399
+## functional needs repair 0.6752 =   2,915 / 4,317
+## non functional          0.2348 =  5,358 / 22,824
+## Totals                  0.1859 = 11,044 / 59,399
 ```
 
 The classes are quite imbalanced and the random forest predicts the largest class, functional, with the highest accuracy and the smallest class, needs repair, with almost 70% error.
@@ -78,11 +81,13 @@ If the model is overfitted, the performance might not generalize to the test set
 
 Make predictions for the test data. `h2o.predict` returns both the most likely class and the the probability for belonging to each class. A submission for the Pump it Up challenge needs only the predicted class, in the first column.
 
+
 ```r
 predictions = as.data.frame(h2o.predict(rfHex,testHex))[,1]
 ```
 
 Finally, save the predictions in the required format as a csv file.
+
 
 ```r
 submission = tbl_dt(fread("data/SubmissionFormat.csv")) %>%
@@ -91,4 +96,4 @@ write.csv(submission,row.names = FALSE,quote = FALSE,
           file = "submission-h2o_randomForest-ntrees1000.csv")
 ```
 
-`h2o.randomForest` is just one of the available algorithms. Other machine learning methods to experiment with are `h2o.gbm`, `h2o.deeplearning` or `h2o.naiveBayes`.
+`h2o.randomForest` is just one of the available algorithms. Other machine learning methods to experiment with are `h2o.gbm`, `h2o.deeplearning` or `h2o.naiveBayes`. 

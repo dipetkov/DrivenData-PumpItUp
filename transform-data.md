@@ -1,11 +1,15 @@
-# Clean the data and engineer some new features
+# Clean up existing predictors. Engineer some new features.
 
 
+
+Load the data and a couple of functions to reduce the number of levels that a categorical variable takes.
 
 
 ```r
-## Read the pre-processed data and a couple of small functions
 source("read-data.R")
+```
+
+```r
 source("myRfunctions.R")
 ```
 
@@ -43,13 +47,12 @@ names(data) ## Or just print the column names
 
 Based on their names alone, some features capture similar information but possibly at different granularity levels (e.g, `extraction_type` and `extraction_type_group`). For each grouping of features, I keep both the coarser and the finer variables but I group some of the smaller levels together so that categorical predictors have about a dosen or so levels.
 
-#### `extraction_type`, `extraction_type_group`, `extraction_type_class`
+### `extraction_type`, `extraction_type_group`, `extraction_type_class`
 
 
 ```r
 data %>%
-  group_by(extraction_type_class, extraction_type_group, extraction_type) %>% 
-  tally()
+  group_by(extraction_type_class, extraction_type_group, extraction_type) %>% tally()
 ```
 
 ```
@@ -96,7 +99,7 @@ data = data %>%
 
 I remove the middle level `extraction_type_group` and combine some of the smaller levels, mostly by brand. For example, I combine *swn 80* and *swn 81* into *swn*.
 
-#### `management`, `management_group`
+### `management`, `management_group`
 
 
 ```r
@@ -125,7 +128,7 @@ data %>% group_by(management_group, management) %>% tally()
 
 I keep both `management` and `management_group` unmodified.
 
-#### `scheme_management`, `scheme_name`
+### `scheme_management`, `scheme_name`
 
 
 ```r
@@ -157,7 +160,7 @@ data = data %>% select( - scheme_name)
 
 I remove `scheme name` as it has too many levels, often with one or handful of examples.
 
-#### `payment`, `payment_type`
+### `payment`, `payment_type`
 
 
 ```r
@@ -185,7 +188,7 @@ data = data %>% select( - payment )
 
 Some categories are renamed but otherwise these features are exactly the same. I keep `payment_type`.
 
-#### `water_quality`, `quality_group`
+### `water_quality`, `quality_group`
 
 
 ```r
@@ -214,7 +217,7 @@ data = data %>% select( - quality_group)
 
 I keep the more precise factor `water_quality`.
 
-#### `quantity`, `quantity_group`
+### `quantity`, `quantity_group`
 
 
 ```r
@@ -240,7 +243,7 @@ data = data %>% select( - quantity_group)
 
 These features are exactly the same. I keep `quantity`.
 
-#### `source`, `source_type`, `source_class`
+### `source`, `source_type`, `source_class`
 
 
 ```r
@@ -266,14 +269,13 @@ data %>% group_by(source_class, source_type, source) %>% tally()
 ```
 
 ```r
-data = data %>% 
-	mutate(source = revalue(source,c("other" = NA))) %>%  
-  select( - source_type)
+data = data %>%
+	mutate(source = revalue(source,c("other" = NA))) %>% select( - source_type)
 ```
 
 I remove the middle level `source_type`. I am not sure if *other* means other or unknown, so I relabel *other* as NA.
 
-#### `waterpoint_type`, `waterpoint_type_group`
+### `waterpoint_type`, `waterpoint_type_group`
 
 
 ```r
@@ -301,7 +303,7 @@ data = data %>% select( - waterpoint_type_group)
 
 I keep the more precise factor `waterpoint_type`.
 
-#### Geographic information
+### Geographic information
 
 Several variables seem to describe the location: `region`, `region_code`, `district_code`, `ward`, `subvillage`, `lga`, `longitude` and `latitude`. The same `district_code` appears in different regions, so I assume this variable indicates a smaller unit within each region.
 
@@ -361,7 +363,6 @@ data = data %>%
                            ifelse(!is.na(district.lat), district.lat, region.lat)))
 ```
 
-
 ```r
 data = data %>% select( - region_code, - district_code,
                         - region.long, - region.lat,
@@ -377,7 +378,7 @@ data = data %>% mutate(lga = ifelse( grepl(" rural", lga), "rural",
                                      ifelse( grepl(" urban", lga), "urban","other")))
 ```
 
-#### Non-random missingness by region
+### Non-random missingness by region
 
 There is also information about the number of people who use the pump, `population`. Since `gps_height` has a strong spatial component, it might be related to the elevation above sea level? Both features have more than 30% missing values, and moreover, these are not missing at random. (So I do not attempt to impute them.)
 
@@ -388,9 +389,9 @@ p2 = ggplot(data, aes(x = longitude, y = latitude, color = population)) + geom_p
 multiplot(p1, p2, cols=2)
 ```
 
-![](Figures/gps_height_population-1.png) 
+![plot of chunk gps_height_population](Figures/gps_height_population-1.png) 
 
-#### Day/Month/Year/Time information
+### Day/Month/Year/Time information
 
 There is some interesting time information as well: `date_recorded` and `construction_year`. Unfortunately, the year of construction is missing for about 35% of the data points. I convert it to `operation_years` by subtracting the year in which the status was recorded. There are a few negative years of operation! I set those to missing, as a clerical error might have occurred.
 
@@ -418,7 +419,7 @@ data = data %>%
 
 I keep the categorical `season` and the numerical `day_of_year`.
 
-#### Other categorical variables
+### Other categorical variables
 
 There are three more categorical variables, with numerous distinct levels.
 
@@ -473,7 +474,7 @@ data = data %>% select( - id , - num_private ) %>%
   filter(scheme_management != "none" | is.na(scheme_management))
 ```
 
-#### Missingness
+### Missingness
 
 Which features have a lot of missing values?
 
@@ -521,4 +522,5 @@ I exclude `amount_tsh` because about 70% of the values are missing.
 ```r
 data = data %>% select( - amount_tsh)
 ```
+
 
